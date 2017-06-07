@@ -49,7 +49,7 @@ beep
 [ max_map, time2max_map, time2max_mapt, avg_time2max, avt, M, I, I2 ] = max_washin_time( vvec2, nrow, ncol, nslice, nel, all, et_vector, x, y, z, last_pfp, mask );
 
  %% choose one method, and apply to each voxel
- datetime('now') % print time at start of processing
+datetime('now') % print time at start of processing
 [ d0_map, df_map, tau1_map, tau2_map, t0_map, t1_map, probe ] = ffitmaps( nrow, ncol, nslice, nscans, nel, time2max_map, time2max_mapt, vvec2, et_vector, f4 );
 datetime('now') % print time when processing is done
 
