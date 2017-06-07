@@ -1,4 +1,4 @@
-function [ timepts, means, times2, nrow, ncol, nslice, nel, nvox, x, y, z, last_pfp, mask, masked_all ] = lungVOIavg2( nscans, y, x, all, t1, times, ROI )
+function [ timepts, means, times2, nrow, ncol, nslice, nel, nvox, last_pfp, mask, masked_all ] = lungVOIavg2( nscans, z, y, x, all, t1, times, ROI )
 %lungVOIavg finds the mean signal intensity values of the lung volume.
 %   This function uses a MIM derived mask to create the volume of
 %   interest -- the lung.  The mean signal intensity is then recorded into
@@ -15,8 +15,6 @@ nel = nrow*ncol*nslice;
 
 timepts = linspace(1,nscans,nscans).';
 
-prompt = 'Enter scan number of last PFP breath-hold.';
-z = input(prompt);
 last_pfp = (y-z) + 1;
 
 mask = ROI>0;
