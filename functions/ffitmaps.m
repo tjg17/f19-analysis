@@ -16,12 +16,14 @@ t1_map = ones(nrow,ncol,nslice); %Map of t1
 probe = zeros(nel,3);
 
 count = 1;
+
 while count <= nel
     
     for a = 1:nslice
         fprintf('\n\n\nComputing Slice %i of %i\n\n\n',a,nslice)
         for b = 1:nrow
-            fprintf('Computing Row %i of %i\n',b,nrow)
+            tStart = tic; % starts timer
+            fprintf('Computing Row %i of %i: ',b,nrow)
             for c = 1:ncol
                 probe(count, 1) = a;
                 probe(count, 2) = b;
@@ -61,7 +63,9 @@ while count <= nel
                 end
                 
                 count = count + 1;
+                
             end
+            fprintf('%0.1f Seconds\n',toc(tStart))
         end
     end
     
