@@ -4,49 +4,37 @@
 % Code computes time constants and washin/washout dynamics for f19 MRI
 
 %% Initialize Workspace
-clear; clf; clc
+clear; clc; close all
+home = pwd;
 
 %% Add functions path
 addpath('./functions')
 
-%% Read and View 3D data
-cd .\functions\ReadData3D_version1k\
-[V1, info1] =ReadData3D;
+%% Choose Patient Info
+SubjectFolder = 'G:\2017-Glass\scratch\f19_test_data\MATLAB Outputs';
+scan_dir = 'G:\2017-Glass\scratch\f19_test_data\MIM Outputs\Subject 0509-002\2015-01__Studies';
+SubjectID = 'TestPatient';
+beginning = SubjectID; % need to see if this is necessary
+startFile = 'G:\2017-Glass\scratch\f19_test_data\MIM Outputs\Subject 0509-002\2015-01__Studies\F19-0509-002_F19-0509-002  29Jan2015_MR_2015-01-28_135901_TRIO^BODY_Coronal.Aligned05\2.16.840.1.114362.1.6.6.9.161209.8888491279.450996790.665.2276';
+startFile_timepoint = 5;
+x =  1; % Enter first air scan number
+y = 11; % Enter last air scan number
+z =  6; % Enter scan number of last PFP breath-hold
+
+%% Load 3D data
+cd('.\functions\ReadData3D_version1k\')
+[V1, info1] =ReadData3D(startFile);
+cd('..\..')
 imtool3D(V1)
-cd ..
-
-%% What is this
-thresh = 100; % Set threshold value for ROI selection!
-
-%% Choose directory of scan date
-SubjectFolder = uigetdir('', 'Select Output Subject Folder');
-scan_dir = uigetdir('', 'Select folder containing DICOM Directories');
-
-prompt4 = 'Enter Subject ID (NormalSubject# or CFSubject#):';
-beginning = input(prompt4, 's');
-
-
 
 %% Read all DICOM files of the entire scan
-[scanfolders, dcmfiles, all, times, nscans, x, y, home] = readall2(scan_dir);
-cd(home)
-
-% j=1;
-% k=18;
-% ma = zeros(64, 64, 18*nscans);
-% for i=1:nscans
-%     ma(:,:,j:k) = all{i};
-%     j=j+18;
-%     k=k+18;
-% end
-% h = ones([3 3 3])/prod([3 3 3]);
-% B=imfilter(ma,h);
+[scanfolders, dcmfiles, all, times, nscans ] = readall2( scan_dir , home , x , y);
 
 %% Make X-Axis acquisition time
 [ et_vector, t ] = elapsedtime_vector( times, nscans );
 
 %% Find mean of whole lung ROI
-[ timepts, means, times, nrow, ncol, nslice, nel, nvox, x, y, z, last_pfp, mask ] = lungVOIavg2( nscans, y, x, all, all{1}, times, V1 );
+[ timepts, means, times, nrow, ncol, nslice, nel, nvox, last_pfp, mask ] = lungVOIavg2( nscans, z, y, x, all, all{1}, times, V1 );
 
 %% Fitting of whole lung
 [ f4 ] = whole_lung_fit( last_pfp, means, et_vector, nscans, beginning );
@@ -56,10 +44,8 @@ beep
 [ masked_all ] = maskcellimages( mask, all, nrow, ncol, nslice, nscans );
 
 %% Find peak wash-in and time to preak wash-in for each voxel
-cd(home)
 [ vvec2, nrow, ncol, nslice, nel, nscans, x, y ] = voxel_vector( masked_all, nscans, x, y );
 
-cd(home)
 [ max_map, time2max_map, time2max_mapt, avg_time2max, avt, M, I, I2 ] = max_washin_time( vvec2, nrow, ncol, nslice, nel, all, et_vector, x, y, z, last_pfp, mask );
 
  %% choose one method, and apply to each voxel
@@ -225,8 +211,7 @@ saveas(fig,heading1)
 heading2 = strcat( beginning, ' df.png' );
 saveas(fig,heading2)
 
-% 
-% cd(home)
+
 % imtool3D(masked_all{5})
 % 
 % imtool3D(all{5})
