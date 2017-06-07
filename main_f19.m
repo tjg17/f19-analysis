@@ -6,12 +6,14 @@
 %% Initialize Workspace
 clear; clf; clc
 
-%% Add function paths
-addpath('.\ReadData3D_version1k\') % 3D data reader
+%% Add functions path
+addpath('./functions')
 
 %% Read and View 3D data
+cd .\functions\ReadData3D_version1k\
 [V1, info1] =ReadData3D;
 imtool3D(V1)
+cd ..
 
 %% What is this
 thresh = 100; % Set threshold value for ROI selection!
