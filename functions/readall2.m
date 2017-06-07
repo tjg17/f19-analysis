@@ -1,4 +1,4 @@
-function [ directories, filenames, scans, times, numscans, x, y, home ] = readall2( scan_dir )
+function [ directories, filenames, scans, times, numscans ] = readall2( scan_dir , home, x , y )
 %reads READS the DICOM files for a all scans and saves it into a
 %64-by-64-by-n double array (ss)
 %   Detailed explanation goes here%
@@ -9,12 +9,6 @@ function [ directories, filenames, scans, times, numscans, x, y, home ] = readal
 % OUTPUT:
 %        A 3D array of those images
 
-if nargin < 1
-    scan_dir = uigetdir();
-end
-
-
-home = pwd;
 
 cd(scan_dir)
 
@@ -45,17 +39,10 @@ end
 directories = only_scans;
 filenames = t;
 
-prompt1 = 'Enter first air scan number.';
-x = input(prompt1);
-prompt2 = 'Enter last air scan number.';
-y = input(prompt2);
-
 nscans = (y-x) + 1;
 nslice = 15; %Number of coronal slices per scan... (MAY NEED TO BE UI IN FUTURE)changed 04-26-17 from 18 to 15
 nrows = 128; %(MAY NEED TO BE UI IN FUTURE)changed 04-26-17 from 64 to 128
 ncols = 128; %(MAY NEED TO BE UI IN FUTURE)changed 04-26-17 from 64 to 128
-nz = nscans * nslice; %Total number of slices... why is this calculated? (tjg17 6/5/2017)
-
 all_scans_3D = cell(nrows, ncols, nslice, nscans);
 all_times = zeros(nscans);
 
