@@ -53,9 +53,9 @@ fprintf('\nComputing fit for each voxel...'); tStart = tic;
 fprintf('done (%0.1f Seconds)',toc(tStart))
 
  %% choose one method, and apply to each voxel
-fprintf('\nComputing fit maps for images...\n\n'); 
+fprintf('\nComputing fit maps for images:'); tStart = tic;
 [ d0_map, df_map, tau1_map, tau2_map, t0_map, t1_map, probe ] = ffitmaps( nrow, ncol, nslice, nscans, nel, time2max_map, time2max_mapt, vvec2, et_vector, f4 );
-datetime('now') % print time when processing is done
+fprintf('\nFit Maps Completed (total time: %0.1f Seconds)',toc(tStart))
 
 %% Write Maps to DICOM Files
 
