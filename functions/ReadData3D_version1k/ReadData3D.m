@@ -382,13 +382,13 @@ if(data.real)
     data.volume=single(data.volume);
     if(isfield(data.info,'RescaleSlope')), 
         data.volume=data.volume*data.info.RescaleSlope;
-    else
-        disp('RescaleSlope not available, assuming 1')
+%     else
+%         disp('RescaleSlope not available, assuming 1')
     end
     if(isfield(data.info,'RescaleIntercept')), 
         data.volume=data.volume+data.info.RescaleIntercept; 
-    else
-        disp('RescaleIntercept not available, assuming 0')
+%     else
+%         disp('RescaleIntercept not available, assuming 0')
     end
 end
 setMyData(data);
