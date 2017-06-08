@@ -10,7 +10,7 @@ addpath('./functions') % Add path for f19 functions
 
 %% Load Parameters for Running
 fprintf('\nLoading Input Parameters...'); tStart = tic; % print status and start timer
-[ SubjectFolder , scan_dir, SubjectID, beginning, startFile, startFile_timepoint, x, y, z ] = LoadParametersF19Analysis();
+[ SubjectFolder , scan_dir, beginning, startFile, x, y, z ] = LoadParametersF19Analysis();
 fprintf('done (%0.1f Seconds)',toc(tStart))
 
 %% Load 3D data
