@@ -9,37 +9,51 @@ home = pwd;
 addpath('./functions') % Add path for f19 functions
 
 %% Load Parameters for Running
+fprintf('\nLoading Input Parameters...'); tStart = tic; % print status and start timer
 [ SubjectFolder , scan_dir, SubjectID, beginning, startFile, startFile_timepoint, x, y, z ] = LoadParametersF19Analysis();
+fprintf('done (%0.1f Seconds)',toc(tStart))
 
 %% Load 3D data
+fprintf('\nLoading 3D Data...'); tStart = tic; % print status and start timer
 cd('.\functions\ReadData3D_version1k\')
 [V1, info1] =ReadData3D(startFile);
-cd('..\..')
-imtool3D(V1)
+cd(home)
+imtool3D(V1);
+fprintf('done (%0.1f Seconds)',toc(tStart))
 
 %% Read all DICOM files of the entire scan
+fprintf('\nReading DICOM files...'); tStart = tic;
 [scanfolders, dcmfiles, all, times, nscans ] = readall2( scan_dir , home , x , y);
+fprintf('done (%0.1f Seconds)',toc(tStart))
 
 %% Make X-Axis acquisition time
+fprintf('\nFinding acquisition times...'); tStart = tic;
 [ et_vector, t ] = elapsedtime_vector( times, nscans );
+fprintf('done (%0.1f Seconds)',toc(tStart))
 
 %% Find mean of whole lung ROI
+fprintf('\nFinding mean of whole lung ROI...'); tStart = tic;
 [ timepts, means, times, nrow, ncol, nslice, nel, nvox, last_pfp, mask ] = lungVOIavg2( nscans, z, y, x, all, all{1}, times, V1 );
+fprintf('done (%0.1f Seconds)',toc(tStart))
 
 %% Fitting of whole lung
+fprintf('\nComputing fit for averaged whole lung...'); tStart = tic;
 [ f4 ] = whole_lung_fit( last_pfp, means, et_vector, nscans, beginning );
-beep
+fprintf('done (%0.1f Seconds)',toc(tStart))
 
 %% Get vector of each voxel signal intensity over time within whole lung ROI
+fprintf('\nGetting voxel vectors over time...'); tStart = tic;
 [ masked_all ] = maskcellimages( mask, all, nrow, ncol, nslice, nscans );
+fprintf('done (%0.1f Seconds)',toc(tStart))
 
-%% Find peak wash-in and time to preak wash-in for each voxel
+%% Find peak wash-in and time to peak wash-in for each voxel
+fprintf('\nComputing fit for each voxel...'); tStart = tic;
 [ vvec2, nrow, ncol, nslice, nel, nscans, x, y ] = voxel_vector( masked_all, nscans, x, y );
-
 [ max_map, time2max_map, time2max_mapt, avg_time2max, avt, M, I, I2 ] = max_washin_time( vvec2, nrow, ncol, nslice, nel, all, et_vector, x, y, z, last_pfp, mask );
+fprintf('done (%0.1f Seconds)',toc(tStart))
 
  %% choose one method, and apply to each voxel
-datetime('now') % print time at start of processing
+fprintf('\nComputing fit maps for images...\n\n'); 
 [ d0_map, df_map, tau1_map, tau2_map, t0_map, t1_map, probe ] = ffitmaps( nrow, ncol, nslice, nscans, nel, time2max_map, time2max_mapt, vvec2, et_vector, f4 );
 datetime('now') % print time when processing is done
 
