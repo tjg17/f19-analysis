@@ -20,10 +20,8 @@ count = 1;
 while count <= nel
     
     for a = 1:nslice
-        fprintf('\n\n\nComputing Slice %i of %i\n\n\n',a,nslice)
+        fprintf('\n   Computing Slice %i of %i...',a,nslice); tStart = tic; % starts timer
         for b = 1:nrow
-            tStart = tic; % starts timer
-            fprintf('Computing Row %i of %i: ',b,nrow)
             for c = 1:ncol
                 probe(count, 1) = a;
                 probe(count, 2) = b;
@@ -61,12 +59,11 @@ while count <= nel
                     t0_map(b, c, a) = 0;
                     t1_map(b, c, a) = 0;
                 end
-                
                 count = count + 1;
                 
-            end
-            fprintf('%0.1f Seconds\n',toc(tStart))
+            end 
         end
+        fprintf('done (%0.1f Seconds)',toc(tStart)) % print timing
     end
     
     
