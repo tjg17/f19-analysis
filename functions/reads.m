@@ -21,7 +21,7 @@ cd(scan_dir)
 single_scan = dir(fullfile(pwd, '*.dcm'));
 s = struct2cell(single_scan);
 
-ss = zeros(128,128,numel(s)/6); %Changed to 128 by 128 voxels and to "numel(s)/6" from "numel(s)/5" on 4-26-2017
+ss = zeros(128,128,numel(s)/6); %Changed to 128 by 128 voxels and to "numel(s)/6" from "numel(s)/5" on 4-26-2017 - tjg17 (note image dimensions here)
 for count = 1 : numel(s)/6
     ss(:,:,count) = dicomread(char(s(1,count)));
     tt(count)=dicominfo(char(s(1,count)));

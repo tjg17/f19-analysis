@@ -3,3 +3,4 @@
 *.asv
 functions/ReadData3D_version1k/lastfile.mat
 functions/ReadData3D_version1k/lastfile.mat
+*.mat

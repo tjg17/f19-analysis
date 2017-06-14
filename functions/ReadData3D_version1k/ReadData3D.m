@@ -22,7 +22,7 @@ function varargout = ReadData3D(varargin)
 %
 % or, 
 %
-% [V,info]=ReadData3D(filename)
+% [V,info]=ReadData3D(filename) % put in the filename here to stop UI
 % 
 % or,
 %

@@ -18,7 +18,7 @@ f4 = fit(et_vector(2:nscans), means(2:nscans), fullfit,'Robust', 'off','Algorith
 %     'Upper', [min(means)+30, max(means) + 30,  500, 500, et_vector(2, 1) + 45, avt + 45],...
     
 
-figure 
+figure
 plot(f4, 'r-', et_vector, means)
 heading = strcat( beginning, ' VOI Wash In/Out Curve' );
 title(heading)

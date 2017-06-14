@@ -18,7 +18,7 @@ fprintf('\nLoading 3D Data...'); tStart = tic; % print status and start timer
 cd('.\functions\ReadData3D_version1k\')
 [V1, info1] =ReadData3D(startFile);
 cd(home)
-imtool3D(V1);
+imtool3D(V1); % plot 3D segmentation map
 fprintf('done (%0.1f Seconds)',toc(tStart))
 
 %% Read all DICOM files of the entire scan

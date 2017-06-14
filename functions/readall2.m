@@ -17,7 +17,7 @@ all_scans = genpath(scan_dir);
 all_scans = strsplit(all_scans, ';');
 length = size(all_scans, 2);
 
-only_scans = all_scans(2 : (length-6));
+only_scans = all_scans(2 : (length-6)); % why is it length -6???? (tjg17) assuming there are 5 masks in the directory
 
 % DICOM READ all those files
 t = cell(30,30);
