@@ -1,4 +1,4 @@
-function [  ] = NormalFitProcess( image , roi , scantimes , last_pfp )
+function [ tau1_map , tau2_map , r2_map ] = NormalFitProcess( image , roi , scantimes , last_pfp )
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
