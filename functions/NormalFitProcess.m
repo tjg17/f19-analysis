@@ -32,7 +32,7 @@ nel       = nrows*ncols*nslices;    % number of elements in image
 [ d0_map , df_map , tau1_map , tau2_map , t0_map , t1_map, r2_map ] = ffitmaps( nrows, ncols, nslices, nscans, nel, time2max_map, time2max_mapTimes, vvec2, scantimes, f4 );
 
 %% Stop Timer
-fprintf('\nFinished F19 Processing.\nTotal Time %0.1f Minutes.\n\n',toc(timeStart)/60)
+fprintf('\nFinished F19 Processing.\nTotal Time %0.1f Minutes.',toc(timeStart)/60)
 
 end
 
@@ -320,7 +320,7 @@ while count <= nel
 end
 
 %% Stop Timer
-fprintf('\nFit Maps Completed (total time: %0.1f Minutes)\n',toc(tfitStart)/60)
+fprintf('\nFit Maps Completed (total time: %0.1f Minutes)',toc(tfitStart)/60)
 
 end
 
