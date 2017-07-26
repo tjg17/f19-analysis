@@ -3,7 +3,7 @@ function [  ] = SplitFitProcess( image , roi , scantimes , last_pfp )
 %   Detailed explanation goes here
 
 %% Start Timer
-fprintf('\nBeginning F19 Processing.\n'); timeStart = tic;
+fprintf('\nBeginning F19 Processing.'); timeStart = tic;
 
 %% Define Derived Variables
 nrows     = size(image, 1);         % number of rows in image
@@ -320,7 +320,7 @@ while count <= nel
 end
 
 %% Stop Timer
-fprintf('\nFit Maps Completed (total time: %0.1f Minutes)\n\n',toc(tfitStart)/60)
+fprintf('\nFit Maps Completed (total time: %0.1f Minutes)\n',toc(tfitStart)/60)
 
 end
 
