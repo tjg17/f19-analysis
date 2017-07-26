@@ -2,8 +2,9 @@ function [  ] = PlotSplitFitResults( PatientNumber, tau1_normal, tau1_split, tau
 %Plot results of split fit vs. normal
 % mask is needed for r2 map
 
-%Plot results of split fit vs. normal
-figure('Name',strcat('Patient_',num2str(PatientNumber,'%03d')),'NumberTitle','off')
+%% Plot Results
+PatientTitle = strcat('Patient_',num2str(PatientNumber,'%03d'));
+figure( 'Name', PatientTitle , 'NumberTitle' , 'off' )
 
 subplot(3,2,1)
 data = tau1_normal;
@@ -35,21 +36,24 @@ title('Tau2 - SPLIT')
 
 subplot(3,2,5)
 data = r2_normal;
-data = single(data).*mask/100;
+data = single(data).*mask;
 histogram_data = data(data>0);
 edges = 0.8:0.01:1;
 histogram(histogram_data,edges)
-poorFits = length(find(r2_normal<80));
+poorFits = length(find(r2_normal<.8));
 title(sprintf('R^2 - NORMAL (%i<0.8)',poorFits))
 
 subplot(3,2,6)
 data = r2_split;
-data = single(data).*mask/100;
+data = single(data).*mask;
 histogram_data = data(data>0);
 edges = 0.8:0.01:1;
 histogram(histogram_data,edges)
-poorFits = length(find(r2_split<80));
+poorFits = length(find(r2_split<0.8));
 title(sprintf('R^2 - SPLIT (%i<0.8)',poorFits))
+
+%% Save Plot
+saveas(gcf,strcat('./figures/',PatientTitle,'.png'))
 
 end
 
