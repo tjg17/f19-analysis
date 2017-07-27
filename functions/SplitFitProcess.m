@@ -1,4 +1,4 @@
-function [ tau1_map , tau2_map , r2_map ] = SplitFitProcess( image , roi , scantimes , last_pfp )
+function [ df_map , tau1_map , r2_Washin_map , d0_map , tau2_map , r2_Washout_map ] = SplitFitProcess( image , roi , scantimes , first_pfp, last_pfp )
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -29,10 +29,7 @@ nel       = nrows*ncols*nslices;    % number of elements in image
 [ max_map , time2max_map , time2max_mapTimes ] = max_washin_time( vvec2, nrows, ncols, nslices, nel, image, scantimes, 1, nscans, last_pfp, last_pfp, mask );
 
 %% Fit WashIn
-[ tau1_map, r2_map ] =   ffitmapsWashin( nrows, ncols, nslices, nscans, nel, time2max_map, time2max_mapTimes, vvec2(:,1:last_pfp),     scantimes(1:last_pfp),     f4 );
-
-%% Fit WashOut
-[ tau2_map         ] = ffitmapsWashout( nrows, ncols, nslices, nscans, nel, time2max_map, time2max_mapTimes, vvec2(:,last_pfp+1:end), scantimes(last_pfp+1:end), f4 );
+[ df_map , tau1_map , r2_Washin_map , d0_map , tau2_map , r2_Washout_map ] =   ffitmapsSplitFit( nrows, ncols, nslices, nel, vvec2, scantimes, f4 , first_pfp , last_pfp );
 
 %% Stop Timer
 fprintf('\nFinished F19 Processing.\nTotal Time %0.1f Minutes.',toc(timeStart)/60)
@@ -234,152 +231,105 @@ fprintf('done (%0.1f Seconds)',toc(tStart))
 
 end
 
-function [ d0_map, df_map, tau1_map, t0_map, r2_map ] = ffitmapsWashin( nrow, ncol, nslice, nscans, nel, time2max_map, time2max_mapt, vvec2, et_vector, f4 )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+function [ df_map , tau1_map , r2_Washin_map , d0_map , tau2_map , r2_Washout_map ] = ffitmapsSplitFit( nrow, ncol, nslice, nel, vvec2, et_vector, f4 , first_PFP , last_PFP )
+%Computes washin and washout fits and outputs parameter maps
+%Splits the time data into a washout and washin section
 
 %% Start Timer
 fprintf('\nComputing fit maps for images:'); tfitStart = tic;
 
-%% Code for Function
-fullfit = fittype('d0 + (df-d0)*[1-exp(-(x-t0)/tau1)]', ...
-    'dependent', {'y'}, 'independent', {'x'}, ...
-    'coefficients', {'d0', 'df', 'tau1', 't0'});
+%% Initialize Parameter Maps
+df_map          = zeros(nrow,ncol,nslice);       %Map of df
+tau1_map        = zeros(nrow,ncol,nslice);       %Map of tau1
+r2_Washin_map   = zeros(nrow,ncol,nslice);       %Map of r-squared washin
 
-d0_map = ones(nrow,ncol,nslice);   %Map of d0
-df_map = ones(nrow,ncol,nslice);   %Map of df
-tau1_map = ones(nrow,ncol,nslice); %Map of tau1
-t0_map = ones(nrow,ncol,nslice);   %Map of t0
-r2_map = ones(nrow,ncol,nslice);   %Map of r-squared
+d0_map          = zeros(nrow,ncol,nslice);       %Map of d0
+tau2_map        = zeros(nrow,ncol,nslice);       %Map of tau2
+r2_Washout_map  = zeros(nrow,ncol,nslice);       %Map of r-squared washout
 
-probe = zeros(nel,3);
+%% Split Data into Washin and Washout Segments
+t_washin     = et_vector(first_PFP:last_PFP); % washin times
+vals_washin  = vvec2(:,first_PFP:last_PFP);   % washin values
 
+t_washout    = et_vector(last_PFP:end);       % washout times
+vals_washout = vvec2(:,last_PFP:end);         % washout values
+
+%% Define Fit Types 
+WashinFit  = fittype('d0 + (df-d0)*[1-exp(-(x-t0)/tau1)]', ...
+                    'independent'  , {'x'}               , ...
+                    'dependent'    , {'y'}               , ...
+                    'problem'      , {'t0','d0'}         , ...
+                    'coefficients' , {'df', 'tau1'}        );
+
+WashoutFit = fittype('d0 + (df-d0)*[exp(-(x-t1)/tau2)]'  , ...
+                     'independent'  , {'x'}              , ...
+                     'dependent'    , {'y'}              , ...
+                     'problem'      , {'t1', 'df'}       , ...
+                     'coefficients' , {'d0', 'tau2'}        );
+
+%% Set Up Upper and Lower Limits for Fitting
+% set up limits for washin
+%last_tau1 = f4.tau1;
+backgroundAverage = 6; % need to change this to be true background average
+dF_lowerlimit = 2*backgroundAverage;
+dF_upperlimit = 70;
+Washin_lower_limits = [       dF_lowerlimit,       10];  % dF and tau 1
+Washin_upper_limits = [       dF_upperlimit,      300];
+
+% set up limits for washout
+%last_tau2 = f4.tau2;
+Washout_lower_limits = [      0.1,       1]; % d0 and tau 2
+Washout_upper_limits = [       3*backgroundAverage,      200];
+                 
+                 
+%% Loop through all voxels and compute fit
 count = 1;
-
 while count <= nel
     
     for a = 1:nslice
         fprintf('\n   Computing Slice %i of %i...',a,nslice); tStart = tic; % starts timer
         for b = 1:nrow
             for c = 1:ncol
-                probe(count, 1) = a;
-                probe(count, 2) = b;
-                probe(count, 3) = c;
                 if max(vvec2(count, :))>0
+                    %% F19 Washin Fit
+                    Washin_start =        [max(vals_washin(count, :)), f4.tau1]; % dF and tau1
+                    [fit_Washin , gof_Washin] = fit(t_washin, vals_washin(count,:).', WashinFit, ...
+                        'problem',      {t_washin(1),vals_washin(count,1)}, ... 
+                        'Lower',        Washin_lower_limits, ...
+                        'Upper',        Washin_upper_limits, ...
+                        'Startpoint',   Washin_start);
+                    
+                    %last_tau1 = fit_Washin.tau1;
+                    % forces fit to go through 2nd PFP point
+                                       
+                    %% F19 Washout Fit
+                    Washout_start =        [backgroundAverage, f4.tau2]; % d0 and tau2
+                    [fit_Washout , gof_Washout] = fit(t_washout, vals_washout(count,:).', WashoutFit, ...
+                        'problem',      {t_washout(1),vals_washout(count, 1)}, ... % may be better way to set this up
+                        'Lower',        Washout_lower_limits, ...
+                        'Upper',        Washout_upper_limits, ...
+                        'Startpoint',   Washout_start);
+                    
+                    %last_tau2 = fit_Washout.tau2;
                     
                     
-                    % Experimental F19 Fit
-                    start = [f4.d0, f4.df, f4.tau1, f4.t0]; 
+                    %% Assign Parameter Map Values
+                    df_map        (b, c, a)    = fit_Washin.df;
+                    tau1_map      (b, c, a)    = fit_Washin.tau1;
+                    r2_Washin_map (b, c, a)    = gof_Washin.rsquare;
                     
-                    [f_vvec , gof] = fit(et_vector, vvec2(count, :).', fullfit, 'Startpoint', start);              
-                    
-                    
-                    
-                    d0_map(b, c, a)    = f_vvec.d0;
-                    df_map (b, c, a)   = f_vvec.df;
-                    tau1_map(b, c, a)  = f_vvec.tau1;
-                    t0_map(b, c, a)    = f_vvec.t0; 
-                    r2_map(b, c, a)    = gof.rsquare;
+                    d0_map        (b, c, a)    = fit_Washout.d0;
+                    tau2_map      (b, c, a)    = fit_Washout.tau2;
+                    r2_Washout_map(b, c, a)    = gof_Washout.rsquare;
                     
                 else
-                    d0_map(b, c, a)    = 0;
-                    df_map (b, c, a)   = 0;
-                    tau1_map(b, c, a)  = 0;
-                    t0_map(b, c, a)    = 0;
-                    r2_map(b, c, a)    = 1;
+                    df_map        (b, c, a)    = 0;
+                    tau1_map      (b, c, a)    = 0;
+                    r2_Washin_map (b, c, a)    = 1;
                     
-                end
-                count = count + 1;
-                
-            end 
-        end
-        fprintf('done (%0.1f Seconds)',toc(tStart)) % print timing
-    end
-    
-    
-end
-
-%% Stop Timer
-fprintf('\nFit Maps Completed (total time: %0.1f Minutes)',toc(tfitStart)/60)
-
-end
-
-function [ d0_map, df_map, tau1_map, tau2_map, t0_map, t1_map, r2_map ] = ffitmapsWashout( nrow, ncol, nslice, nscans, nel, time2max_map, time2max_mapt, vvec2, et_vector, f4 )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-
-%% Start Timer
-fprintf('\nComputing fit maps for images:'); tfitStart = tic;
-
-%% Code for Function
-fullfit = fittype('(x>=t0 & x<=t1)*[d0 + (df-d0)*[1-exp(-(x-t0)/tau1)]] + (x>=t1)*[d0 + (df-d0)*[1-exp(-(t1-t0)/tau2)]*[exp(-(x-t1)/tau2)]] ', ...
-    'dependent', {'y'}, 'independent', {'x'}, ...
-    'coefficients', {'d0', 'df', 'tau1', 'tau2', 't0', 't1'});
-
-d0_map = ones(nrow,ncol,nslice);   %Map of d0
-df_map = ones(nrow,ncol,nslice);   %Map of df
-tau1_map = ones(nrow,ncol,nslice); %Map of tau1
-tau2_map = ones(nrow,ncol,nslice); %Map of tau2
-t0_map = ones(nrow,ncol,nslice);   %Map of t0
-t1_map = ones(nrow,ncol,nslice);   %Map of t1
-r2_map = ones(nrow,ncol,nslice);   %Map of r-squared
-
-probe = zeros(nel,3);
-
-count = 1;
-
-while count <= nel
-    
-    for a = 1:nslice
-        fprintf('\n   Computing Slice %i of %i...',a,nslice); tStart = tic; % starts timer
-        for b = 1:nrow
-            for c = 1:ncol
-                probe(count, 1) = a;
-                probe(count, 2) = b;
-                probe(count, 3) = c;
-                if max(vvec2(count, :))>0
-                    
-                    %mt1 = (.5*f4.tau1);
-                    %mt2 = (.5*f4.tau2);
-                    %lower_limits = [vvec2(count, 1) - 50, vvec2(count, time2max_map(b, c, a)) - 50, f4.tau1 - mt1, f4.tau2 - mt2, et_vector(2, 1) - 60, time2max_mapt(b, c, a) - 60];
-                    %upper_limits = [vvec2(count, 1) + 50, vvec2(count, time2max_map(b, c, a)) + 50, f4.tau1 + mt1, f4.tau2 + mt2, et_vector(2, 1) + 60, time2max_mapt(b, c, a) + 60];
-                    %lower_limits = [vvec2(count, 1) - 15, vvec2(count, time2max_map(b, c, a)) - 50, f4.tau1 - mt1, f4.tau2 - mt2, f4.t0 - 60, f4.t1 - 60];
-                    %upper_limits = [vvec2(count, 1) + 15, vvec2(count, time2max_map(b, c, a)) + 50, f4.tau1 + mt1, f4.tau2 + mt2, f4.t0 + 60, f4.t1 + 60];
-                    %start = [f4.d0, f4.df, f4.tau1, f4.tau2, f4.t0, f4.t1];
-                    
-                    % Experimental F19 Fit
-                    mt1 = (.75*f4.tau1);
-                    mt2 = (.75*f4.tau2);
-                    lower_limits = [                   0,                                    10.01, f4.tau1 - mt1, f4.tau2 - mt2,           0, f4.t1 - 60];
-                    upper_limits = [                  10, vvec2(count, time2max_map(b, c, a)) + 10, f4.tau1 + mt1, f4.tau2 + mt2, f4.t0 + 400, f4.t1 + 400];
-                    start = [f4.d0, f4.df, f4.tau1, f4.tau2, f4.t0, f4.t1]; 
-                    
-                    [f_vvec , gof] = fit(et_vector(2: nscans), vvec2(count, 2:nscans).', fullfit,'Lower', lower_limits,... %LEFT OFF HERE!!!!
-                        'Upper', upper_limits, 'Startpoint', start);              
-                    
-                    
-                    %                     legend('off')
-                    %                     plot(f_vvec, 'b-', et_vector, vvec2(count))
-                    %                     hold on
-                    %                     legend('off')
-                    
-                    
-                    d0_map(b, c, a)    = f_vvec.d0;
-                    df_map (b, c, a)   = f_vvec.df;
-                    tau1_map(b, c, a)  = f_vvec.tau1;
-                    tau2_map(b, c, a)  = f_vvec.tau2;
-                    t0_map(b, c, a)    = f_vvec.t0; 
-                    t1_map(b, c, a)    = f_vvec.t1;
-                    r2_map(b, c, a)    = gof.rsquare;
-                    
-                else
-                    d0_map(b, c, a)    = 0;
-                    df_map (b, c, a)   = 0;
-                    tau1_map(b, c, a)  = 0;
-                    tau2_map(b, c, a)  = 0;
-                    t0_map(b, c, a)    = 0;
-                    t1_map(b, c, a)    = 0;
-                    r2_map(b, c, a)    = 1;
+                    d0_map        (b, c, a)    = 0;
+                    tau2_map      (b, c, a)    = 0;
+                    r2_Washout_map(b, c, a)    = 1;
                     
                 end
                 count = count + 1;
