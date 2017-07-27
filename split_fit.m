@@ -9,10 +9,15 @@ home = pwd;
 addpath('./functions') % Add path for f19 processing functions
 addpath('G:\2017-Glass\mim\f19_MATLAB_workspaces') % add path for f19 data
 
-%% LDefine Patients and Last PFP Times
+%% Data for First and Last PFP Times
 patientNumbers = [ 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20];
 first_PFP      = [ 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
 last_PFP       = [ 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6]; % updated 7/27/17
+
+%% Select Patients for Experiment to Run
+patientNumbers = [ 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20];
+first_PFP      = [ 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
+last_PFP       = [ 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6]; 
 
 %% Loop Through all F19 Patients
 tic
