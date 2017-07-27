@@ -19,7 +19,7 @@ for i=1:length(patientNumbers)
     % Load Patient Data
     filename = strcat('0509-',num2str(patientNumbers(i),'%03d'),'.mat');
     load(filename);
-    fprintf('Starting Patient %03d', patientNumbers(i))
+    fprintf('\n\n\nStarting Patient %03d', patientNumbers(i))
     
     % Process Normal Fit
     [tau1_normal , tau2_normal , r2_normal ] = NormalFitProcess( image , roi , scantimes , last_PFP(i) );
