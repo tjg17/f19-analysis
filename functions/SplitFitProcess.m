@@ -28,8 +28,11 @@ nel       = nrows*ncols*nslices;    % number of elements in image
 %% Computing Max Wash in Times
 [ max_map , time2max_map , time2max_mapTimes ] = max_washin_time( vvec2, nrows, ncols, nslices, nel, image, scantimes, 1, nscans, last_pfp, last_pfp, mask );
 
- %% choose one method, and apply to each voxel
-[ d0_map , df_map , tau1_map , tau2_map , t0_map , t1_map, r2_map ] = ffitmaps( nrows, ncols, nslices, nscans, nel, time2max_map, time2max_mapTimes, vvec2, scantimes, f4 );
+%% Fit WashIn
+[ tau1_map, r2_map ] =   ffitmapsWashin( nrows, ncols, nslices, nscans, nel, time2max_map, time2max_mapTimes, vvec2(:,1:last_pfp),     scantimes(1:last_pfp),     f4 );
+
+%% Fit WashOut
+[ tau2_map         ] = ffitmapsWashout( nrows, ncols, nslices, nscans, nel, time2max_map, time2max_mapTimes, vvec2(:,last_pfp+1:end), scantimes(last_pfp+1:end), f4 );
 
 %% Stop Timer
 fprintf('\nFinished F19 Processing.\nTotal Time %0.1f Minutes.',toc(timeStart)/60)
@@ -231,7 +234,77 @@ fprintf('done (%0.1f Seconds)',toc(tStart))
 
 end
 
-function [ d0_map, df_map, tau1_map, tau2_map, t0_map, t1_map, r2_map ] = ffitmaps( nrow, ncol, nslice, nscans, nel, time2max_map, time2max_mapt, vvec2, et_vector, f4 )
+function [ d0_map, df_map, tau1_map, t0_map, r2_map ] = ffitmapsWashin( nrow, ncol, nslice, nscans, nel, time2max_map, time2max_mapt, vvec2, et_vector, f4 )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+%% Start Timer
+fprintf('\nComputing fit maps for images:'); tfitStart = tic;
+
+%% Code for Function
+fullfit = fittype('d0 + (df-d0)*[1-exp(-(x-t0)/tau1)]', ...
+    'dependent', {'y'}, 'independent', {'x'}, ...
+    'coefficients', {'d0', 'df', 'tau1', 't0'});
+
+d0_map = ones(nrow,ncol,nslice);   %Map of d0
+df_map = ones(nrow,ncol,nslice);   %Map of df
+tau1_map = ones(nrow,ncol,nslice); %Map of tau1
+t0_map = ones(nrow,ncol,nslice);   %Map of t0
+r2_map = ones(nrow,ncol,nslice);   %Map of r-squared
+
+probe = zeros(nel,3);
+
+count = 1;
+
+while count <= nel
+    
+    for a = 1:nslice
+        fprintf('\n   Computing Slice %i of %i...',a,nslice); tStart = tic; % starts timer
+        for b = 1:nrow
+            for c = 1:ncol
+                probe(count, 1) = a;
+                probe(count, 2) = b;
+                probe(count, 3) = c;
+                if max(vvec2(count, :))>0
+                    
+                    
+                    % Experimental F19 Fit
+                    start = [f4.d0, f4.df, f4.tau1, f4.t0]; 
+                    
+                    [f_vvec , gof] = fit(et_vector, vvec2(count, :).', fullfit, 'Startpoint', start);              
+                    
+                    
+                    
+                    d0_map(b, c, a)    = f_vvec.d0;
+                    df_map (b, c, a)   = f_vvec.df;
+                    tau1_map(b, c, a)  = f_vvec.tau1;
+                    t0_map(b, c, a)    = f_vvec.t0; 
+                    r2_map(b, c, a)    = gof.rsquare;
+                    
+                else
+                    d0_map(b, c, a)    = 0;
+                    df_map (b, c, a)   = 0;
+                    tau1_map(b, c, a)  = 0;
+                    t0_map(b, c, a)    = 0;
+                    r2_map(b, c, a)    = 1;
+                    
+                end
+                count = count + 1;
+                
+            end 
+        end
+        fprintf('done (%0.1f Seconds)',toc(tStart)) % print timing
+    end
+    
+    
+end
+
+%% Stop Timer
+fprintf('\nFit Maps Completed (total time: %0.1f Minutes)',toc(tfitStart)/60)
+
+end
+
+function [ d0_map, df_map, tau1_map, tau2_map, t0_map, t1_map, r2_map ] = ffitmapsWashout( nrow, ncol, nslice, nscans, nel, time2max_map, time2max_mapt, vvec2, et_vector, f4 )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -323,4 +396,3 @@ end
 fprintf('\nFit Maps Completed (total time: %0.1f Minutes)',toc(tfitStart)/60)
 
 end
-
