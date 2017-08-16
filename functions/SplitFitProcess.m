@@ -14,6 +14,7 @@ nel       = nrows*ncols*nslices;    % number of elements in image
 
 %% Find mean pixel values in ROI
 [ means , mask ] = ComputePixelAverageIn3DROI( image, roi );
+means
 
 %% Fitting of ROI volume
 [ f4 ] = ROIVentilationFit( last_pfp , means , scantimes , nscans );
@@ -29,7 +30,7 @@ nel       = nrows*ncols*nslices;    % number of elements in image
 [ max_map , time2max_map , time2max_mapTimes ] = max_washin_time( vvec2, nrows, ncols, nslices, nel, image, scantimes, 1, nscans, last_pfp, last_pfp, mask );
 
 %% Fit WashIn
-[ df_map , tau1_map , r2_Washin_map , d0_map , tau2_map , r2_Washout_map ] =   ffitmapsSplitFit( nrows, ncols, nslices, nel, vvec2, scantimes, f4 , first_pfp , last_pfp );
+[ df_map , tau1_map , r2_Washin_map , d0_map , tau2_map , r2_Washout_map ] =   ffitmapsSplitFit( nrows, ncols, nslices, nel, vvec2, scantimes, f4 , first_pfp , last_pfp , image);
 
 %% Stop Timer
 fprintf('\nFinished F19 Processing.\nTotal Time %0.1f Minutes.',toc(timeStart)/60)
@@ -231,7 +232,7 @@ fprintf('done (%0.1f Seconds)',toc(tStart))
 
 end
 
-function [ df_map , tau1_map , r2_Washin_map , d0_map , tau2_map , r2_Washout_map ] = ffitmapsSplitFit( nrow, ncol, nslice, nel, vvec2, et_vector, f4 , first_PFP , last_PFP )
+function [ df_map , tau1_map , r2_Washin_map , d0_map , tau2_map , r2_Washout_map ] = ffitmapsSplitFit( nrow, ncol, nslice, nel, vvec2, et_vector, f4 , first_PFP , last_PFP , image)
 %Computes washin and washout fits and outputs parameter maps
 %Splits the time data into a washout and washin section
 
@@ -264,22 +265,24 @@ WashinFit  = fittype('d0 + (df-d0)*[1-exp(-(x-t0)/tau1)]', ...
 WashoutFit = fittype('d0 + (df-d0)*[exp(-(x-t1)/tau2)]'  , ...
                      'independent'  , {'x'}              , ...
                      'dependent'    , {'y'}              , ...
-                     'problem'      , {'t1', 'df'}       , ...
-                     'coefficients' , {'d0', 'tau2'}        );
+                     'problem'      , {'t1', 'df', 'd0'} , ...
+                     'coefficients' , {'tau2'}             );
 
 %% Set Up Upper and Lower Limits for Fitting
 % set up limits for washin
 %last_tau1 = f4.tau1;
-backgroundAverage = 6; % need to change this to be true background average
-dF_lowerlimit = 2*backgroundAverage;
-dF_upperlimit = 70;
-Washin_lower_limits = [       dF_lowerlimit,       10];  % dF and tau 1
+lastSlice = image(:,:,:,end);
+d0_value = mean(lastSlice(:)); % set d0 to be mean of last slice values
+
+dF_lowerlimit = 2*d0_value;
+dF_upperlimit = 100;
+Washin_lower_limits = [       dF_lowerlimit,       5];  % dF and tau 1
 Washin_upper_limits = [       dF_upperlimit,      300];
 
 % set up limits for washout
 %last_tau2 = f4.tau2;
-Washout_lower_limits = [      0.1,       1]; % d0 and tau 2
-Washout_upper_limits = [       3*backgroundAverage,      200];
+Washout_lower_limits = [             5]; % tau 2
+Washout_upper_limits = [           200];
                  
                  
 %% Loop through all voxels and compute fit
@@ -303,9 +306,9 @@ while count <= nel
                     % forces fit to go through 2nd PFP point
                                        
                     %% F19 Washout Fit
-                    Washout_start =        [backgroundAverage, f4.tau2]; % d0 and tau2
+                    Washout_start =        [f4.tau2]; % d0 and tau2
                     [fit_Washout , gof_Washout] = fit(t_washout, vals_washout(count,:).', WashoutFit, ...
-                        'problem',      {t_washout(1),vals_washout(count, 1)}, ... % may be better way to set this up
+                        'problem',      {t_washout(1),vals_washout(count, 1), d0_value}, ... % t1, dF, d0
                         'Lower',        Washout_lower_limits, ...
                         'Upper',        Washout_upper_limits, ...
                         'Startpoint',   Washout_start);
