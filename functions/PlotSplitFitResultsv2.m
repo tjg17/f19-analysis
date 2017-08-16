@@ -1,5 +1,5 @@
-function [  ] = PlotSplitFitResults( PatientNumber, FigureDirectory, tau1_normal, tau1_split, tau2_normal, tau2_split, r2_normal, r2_split, mask )
-%Plot results of split fit vs. normal
+function [  ] = PlotSplitFitResultsv2( PatientNumber, FigureDirectory, tau1, tau2, dF, d0, r2_Washin, r2_Washout, mask )
+%Plot results of split fit for tau1, tau2, d0, df, and both r2 in and out
 % mask is needed for r2 map
 
 %% Plot Results
@@ -7,50 +7,50 @@ PatientTitle = strcat('Patient_',num2str(PatientNumber,'%03d'));
 figure( 'Name', PatientTitle , 'NumberTitle' , 'off' )
 
 subplot(3,2,1)
-data = tau1_normal;
+data = tau1;
 histogram_data = data(data>0);
-edges = 0 : 2 : max(data(:));
+edges = 0 : 4 : max(data(:));
 histogram(histogram_data,edges)
-title('Tau1 - NORMAL')
+title('tau1')
 
 subplot(3,2,2)
-data = tau1_split;
+data = tau2;
 histogram_data = data(data>0);
-edges = 0 : 2 : max(data(:));
+edges = 0 : 4 : max(data(:));
 histogram(histogram_data,edges)
-title('Tau1 - SPLIT')
+title('tau2')
 
 subplot(3,2,3)
-data = tau2_normal;
+data = dF;
 histogram_data = data(data>0);
 edges = 0 : 2 : max(data(:));
 histogram(histogram_data,edges)
-title('Tau2 - NORMAL')
+title('dF')
 
 subplot(3,2,4)
-data = tau2_split;
+data = d0;
 histogram_data = data(data>0);
-edges = 0 : 2 : max(data(:));
+edges = 0 : 0.25 : max(data(:));
 histogram(histogram_data,edges)
-title('Tau2 - SPLIT')
+title('d0')
 
 subplot(3,2,5)
-data = r2_normal;
+data = r2_Washin;
 data = single(data).*mask;
 histogram_data = data(data>0);
 edges = 0.8:0.01:1;
 histogram(histogram_data,edges)
-poorFits = length(find(r2_normal<.8));
-title(sprintf('R^2 - NORMAL (%i<0.8)',poorFits))
+poorFits = length(find(r2_Washin<.8));
+title(sprintf('R^2 - Washin (%i<0.8)',poorFits))
 
 subplot(3,2,6)
-data = r2_split;
+data = r2_Washout;
 data = single(data).*mask;
 histogram_data = data(data>0);
 edges = 0.8:0.01:1;
 histogram(histogram_data,edges)
-poorFits = length(find(r2_split<0.8));
-title(sprintf('R^2 - SPLIT (%i<0.8)',poorFits))
+poorFits = length(find(r2_Washout<0.8));
+title(sprintf('R^2 - Washout (%i<0.8)',poorFits))
 
 %% Save Plot
 saveas(gcf,strcat(FigureDirectory,PatientTitle,'.png'))

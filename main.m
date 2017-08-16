@@ -14,13 +14,13 @@ first_PFP      = [ 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2]
 last_PFP       = [ 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6]; % updated 7/27/17
 
 %% Select Patients for Experiment to Run
-ExperimentName  = 'exp2';
+ExperimentName  = 'd0_constant';
 FigureDirectory    = strcat('../../f19_fit_results/',ExperimentName,'/figures/');    mkdir(FigureDirectory);
 ParameterDirectory = strcat('../../f19_fit_results/',ExperimentName,'/parameters/'); mkdir(ParameterDirectory);
 
-patientNumbers  = [ 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20];
-first_PFP       = [ 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
-last_PFP        = [ 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6]; 
+% patientNumbers  = [ 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20];
+% first_PFP       = [ 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
+% last_PFP        = [ 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6]; 
 
 Control = [ 3; 4; 5; 11; 15; 16; 17];
 Exper   = [ 7; 8; 9; 10; 12; 13; 14; 18]; % not sure on 19,20
@@ -37,16 +37,22 @@ for i=1:length(patientNumbers)
     %[tau1_normal , tau2_normal , r2_normal , mask ] = NormalFitProcess( image , roi , scantimes , last_PFP(i) );
     
     % Process Split Fit
-    [ dF , tau1 , r2_Washin , d0 , tau2 , r2_Washout ] =  SplitFitProcess( image , roi , scantimes , first_PFP(i), last_PFP(i) );
+    %[ dF , tau1 , r2_Washin , d0 , tau2 , r2_Washout ] =  SplitFitProcess( image , roi , scantimes , first_PFP(i), last_PFP(i) );
     
     % Plot Results
-    PlotSplitFitResultsv2( patientNumbers(i), FigureDirectory, tau1, tau2, dF, d0, r2_Washin, r2_Washout, mask )
+    %PlotSplitFitResultsv2( patientNumbers(i), FigureDirectory, tau1, tau2, dF, d0, r2_Washin, r2_Washout, mask )
     
     % Save Parameters
-    SaveFitParameterData(patientNumbers(i), ParameterDirectory, tau1, tau2, dF, d0)
+    %SaveFitParameterData(patientNumbers(i), ParameterDirectory, tau1, tau2, dF, d0)
     %VentilationVolumeLiters(i,1) = patientNumbers(i);
     %Mask = imresize(roi,[64,64]);
     %VentilationVolumeLiters(i,2) = sum(Mask(:))*6.25*6.25*15/1e6;
+    backgroundslice1 = image(:,:,:,1); backgroundslice1 = backgroundslice1(:);
+    backgroundslice2 = image(:,:,:,end); backgroundslice2 = backgroundslice2(:);
+    means1(i) = mean(backgroundslice1);
+    means2(i) = mean(backgroundslice2);
+    noise1(i) = std(backgroundslice1);
+    noise2(i) = std(backgroundslice2);
     
 end
 toc
