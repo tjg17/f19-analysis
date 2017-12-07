@@ -12,9 +12,14 @@ addpath('./functions') % Add path for f19 processing functions
 %addpath('G:\2017-Glass\mim\f19_ventilation_segmentations')
 
 %% Data for First and Last PFP Times
-patientNumbers = [2; 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 24; 25];
-first_PFP      = [2; 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
-last_PFP       = [7; 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6;  6;  6;  4;  6]; % updated 11/11/2017
+patientNumbers = [2; 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 24; 25; 26; 27; 28];
+first_PFP      = [2; 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
+last_PFP       = [7; 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6;  6;  6;  4;  6;  6;  4;  6]; % updated 12/07/2017
+
+BGD = [5.32985	6.0345	5.8718	6.14255	5.8982	5.88445	5.98415	5.86475	5.78295	6.48255	5.978	5.85025	4.8496	4.8497	4.9275	4.92565 ...
+    4.8934	4.84835	10.8336	7.98885	9.33085	9.66375	9.6091	9.76625	9.6471];
+
+
 
 %% Select Patients for Experiment to Run
 %ExperimentName  = 'd0_constant';
@@ -79,6 +84,16 @@ for i=1:length(patientNumbers)
     Anatomic_ApexBase(i) = ComputeApexBaseMeasurement(inspiration_roi, anatomic_pixel_size);
     Anatomic_AnteriorPosterior(i) = ComputeAntPostMeasurement(inspiration_roi, anatomic_slice_thickness);
     Anatomic_LeftRight(i) = ComputeLeftRightMeasurement(inspiration_roi, anatomic_pixel_size);
+    
+    slice1 = image(:,:,:,1);
+    FirstSlice_Mean(i) = mean(slice1(:));
+    FirstSliceSTD(i) = std(slice1(:));
+    
+    sliceEnd = image(:,:,:,end);
+    lastSlice_Mean(i) = mean(sliceEnd(:));
+    lastSliceSTD(i) = std(sliceEnd(:));
+    
+    
     
     % Compute 
     
