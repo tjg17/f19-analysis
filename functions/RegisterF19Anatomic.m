@@ -9,7 +9,7 @@ mild = [9;10;13;18;20;24;25];
 moderate = [7;8;12;14;22];
 
 % choose set
-patients = 20;
+patients = normals;
 for i = 1:length(patients)
     
     % load ventilaion
@@ -110,11 +110,11 @@ for i = 1:length(patients)
     imshowpair(fixed(:,:,17), f19_MOVING(:,:,17),'Scaling','joint');
     
    
-    %% Save figure (optional)
-    FigureDirectory    = strcat('G:/2017-Glass/f19_fit_results/Registered/');  mkdir(FigureDirectory);
-    FigureName = strcat('Registration_Patient_',string(patients(i)));
-    FileName = char(strcat(FigureDirectory,FigureName,'.png'));
-    saveas(gcf,FileName)
+%     %% Save figure (optional)
+%     FigureDirectory    = strcat('G:/2017-Glass/f19_fit_results/Registered/');  mkdir(FigureDirectory);
+%     FigureName = strcat('Registration_Patient_',string(patients(i)));
+%     FileName = char(strcat(FigureDirectory,FigureName,'.png'));
+%     saveas(gcf,FileName)
 
     %% Pause and return to home
     pause(1)
