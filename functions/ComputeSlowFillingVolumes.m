@@ -1,4 +1,4 @@
-function [ SlowFillingVolume , SlowFillingPercentage ] = ComputeSlowFillingVolumes( image , roi , first_PFP , PatientNumber, washincycles , unventilated_threshold )
+function [ SlowFillingVolume , SlowFillingPercentage , SlowFillingMask ] = ComputeSlowFillingVolumes( image , roi , first_PFP , PatientNumber, washincycles , unventilated_threshold )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -13,6 +13,7 @@ SlowFillingImage = image(:,:,:,first_PFP+washincycles-1).*Mask; % firstPFP inclu
 SlowFillingImage(find(SlowFillingImage<0.5)) = 100; % set outside lung to some high value
 SlowFillingImage(find(SlowFillingImage>unventilated_threshold)) = 0; % set all values greater than threshold to 0
 SlowFillBinary = SlowFillingImage; SlowFillBinary(find(SlowFillBinary>0.5)) = 1;
+SlowFillingMask = SlowFillBinary;
 
 % SlowFillBinary = zeros(size(SlowFillingImage));
 % for slice = 1:size(SlowFillingImage,3)
