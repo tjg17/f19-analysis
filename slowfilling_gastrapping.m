@@ -13,7 +13,7 @@ first_PFP      = [2; 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  
 last_PFP       = [7; 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6;  6;  6;  4;  6;  6;  4;  6]; % updated 12/07/2017
 
 %% Selected Image Data
-f19_pixel_size = 0.625; % cm
+f19_pixel_size = .625; % cm
 f19_slice_thickness = 1.5; % cm
 anatomic_pixel_size = 0.3125; % cm
 anatomic_slice_thickness = 1.5; % cm
@@ -62,7 +62,7 @@ for i=1:length(patientNumbers)
     [GasTrappingVolumes(i) , GasTrappingPercentages(i) , GasTrappingMask(:,:,:,i) ] = ComputeGasTrappingVolumes(image, roi, last_PFP(i)  , patientNumbers(i) , 3 , threshold_value(i)); % 3 washout cycles
     
     %% Compute Overlap and Combined Volumes
-    [Overlap_GTSF_Volumes(i) Combined_GTSF_Volumes(i)] = ComputeCombinedOverlapVolumes(SlowFillingMask(:,:,:,i) , GasTrappingMask(:,:,:,i) );
+    [Overlap_GTSF_Volumes(i) Combined_GTSF_Volumes(i)] = ComputeCombinedOverlapVolumes(SlowFillingMask(:,:,:,i) , GasTrappingMask(:,:,:,i) , f19_pixel_size , f19_slice_thickness );
     
 end
 
