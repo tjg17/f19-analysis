@@ -3,13 +3,13 @@ clear;clc;
 home = pwd;
 
 % choose patient
-all = [2;3;4;5;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;24;25];
+all = [2;3;4;5;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;24;25;26;27;28];
 normals = [2;3;4;5;11;15;16;17;19;21];
 mild = [9;10;13;18;20;24;25];
 moderate = [7;8;12;14;22];
 
 % choose set
-patients = normals;
+patients = all;
 for i = 1:length(patients)
     
     % load ventilaion
@@ -26,6 +26,9 @@ for i = 1:length(patients)
     load(filename)
     fixed = imresize(inspiration_ROI, [128,128]); % anat is fixed
     fixed(:,:,16:18) = 0; % make fixed the same size as moving functional
+    
+    % back to home directory
+    cd(home)
 
 %     % view images
 %     figure(1);clf
@@ -69,7 +72,7 @@ for i = 1:length(patients)
     %optimizer.MaximumStepLength = 0.0625;
     %optimizer.MaximumIterations = 2;
     %optimizer.RelaxationFactor = 0.1;
-    f19_MOVING = imregister(uint8(moving), uint8(fixed), 'translation', optimizer, metric);
+    f19_MOVING = imregister(uint8(moving), uint8(fixed), 'affine', optimizer, metric);
 
     %% Plot Registered Results
     figure(1);clf
@@ -111,10 +114,13 @@ for i = 1:length(patients)
     
    
 %     %% Save figure (optional)
-%     FigureDirectory    = strcat('G:/2017-Glass/f19_fit_results/Registered/');  mkdir(FigureDirectory);
+%     FigureDirectory    = strcat('G:/2017-Glass/f19_fit_results/TranslationRegistration/');  mkdir(FigureDirectory);
 %     FigureName = strcat('Registration_Patient_',string(patients(i)));
 %     FileName = char(strcat(FigureDirectory,FigureName,'.png'));
 %     saveas(gcf,FileName)
+
+    %% Compute Overlap and combined volumes
+    [Overlap_Volumes(i) Combined_Volumes(i)] = ComputeCombinedOverlapVolumes(fixed , f19_MOVING , 0.3125 , 1.5 );
 
     %% Pause and return to home
     pause(1)
@@ -122,3 +128,7 @@ for i = 1:length(patients)
     
     
 end
+
+Overlap_Volumes'
+
+Combined_Volumes'
