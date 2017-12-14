@@ -64,15 +64,18 @@ for i = 1:length(patients)
 %     imshowpair(fixed(:,:,16), moving(:,:,16),'Scaling','joint');
 %     subplot(4,4,16)
 %     imshowpair(fixed(:,:,17), moving(:,:,17),'Scaling','joint');
+    
+    %% Stretch F19 to match anatomic respiratory effort
+    moving = Stretch_Functional3D(moving,fixed);
 
-    % set up registration
+    %% Set up registration
     [optimizer, metric] = imregconfig('monomodal');
     %optimizer.GradientMagnitudeTolerance = 1e-2;
     %optimizer.MinimumStepLength = 1e-5;
     %optimizer.MaximumStepLength = 0.0625;
     %optimizer.MaximumIterations = 2;
     %optimizer.RelaxationFactor = 0.1;
-    f19_MOVING = imregister(uint8(moving), uint8(fixed), 'affine', optimizer, metric);
+    f19_MOVING = imregister(uint8(moving), uint8(fixed), 'translation', optimizer, metric);
 
     %% Plot Registered Results
     figure(1);clf
@@ -114,7 +117,7 @@ for i = 1:length(patients)
     
    
 %     %% Save figure (optional)
-%     FigureDirectory    = strcat('G:/2017-Glass/f19_fit_results/TranslationRegistration/');  mkdir(FigureDirectory);
+%     FigureDirectory    = strcat('G:/2017-Glass/f19_fit_results/StretchTranslationRegistration/');  mkdir(FigureDirectory);
 %     FigureName = strcat('Registration_Patient_',string(patients(i)));
 %     FileName = char(strcat(FigureDirectory,FigureName,'.png'));
 %     saveas(gcf,FileName)
