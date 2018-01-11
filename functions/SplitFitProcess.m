@@ -264,8 +264,8 @@ WashinFit  = fittype('d0 + (df-d0)*[1-exp(-(x-t0)/tau1)]', ...
 WashoutFit = fittype('d0 + (df-d0)*[exp(-(x-t1)/tau2)]'  , ...
                      'independent'  , {'x'}              , ...
                      'dependent'    , {'y'}              , ...
-                     'problem'      , {'t1', 'df', 'd0'} , ...
-                     'coefficients' , {'tau2'}             );
+                     'problem'      , {'t1', 'df'}       , ...
+                     'coefficients' , {'d0', 'tau2'}             );
 
 %% Set Up Upper and Lower Limits for Fitting
 % set up limits for washin
@@ -280,8 +280,8 @@ Washin_upper_limits = [       dF_upperlimit,      300];
 
 % set up limits for washout
 %last_tau2 = f4.tau2;
-Washout_lower_limits = [             5]; % tau 2
-Washout_upper_limits = [           200];
+Washout_lower_limits = [             0.1, 5]; % d0 and tau 2
+Washout_upper_limits = [           3*d0_value, 200];
                  
                  
 %% Loop through all voxels and compute fit
@@ -305,9 +305,9 @@ while count <= nel
                     % forces fit to go through 2nd PFP point
                                        
                     %% F19 Washout Fit
-                    Washout_start =        [f4.tau2]; % d0 and tau2
+                    Washout_start =        [d0_value, f4.tau2]; % d0 and tau2
                     [fit_Washout , gof_Washout] = fit(t_washout, vals_washout(count,:).', WashoutFit, ...
-                        'problem',      {t_washout(1),vals_washout(count, 1), d0_value}, ... % t1, dF, d0
+                        'problem',      {t_washout(1),vals_washout(count, 1)}, ... % t1, dF
                         'Lower',        Washout_lower_limits, ...
                         'Upper',        Washout_upper_limits, ...
                         'Startpoint',   Washout_start);
