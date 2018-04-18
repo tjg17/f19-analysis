@@ -8,9 +8,9 @@ home = pwd;
 addpath('./functions') % Add path for f19 processing functions
 
 %% Data for First and Last PFP Times
-patientNumbers = [2; 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 24; 25; 26; 27; 28];
-first_PFP      = [2; 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
-last_PFP       = [7; 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6;  6;  6;  4;  6;  6;  4;  6]; % updated 12/07/2017
+patientNumbers = [2; 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 24; 25; 26; 27; 28; 33];
+first_PFP      = [2; 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
+last_PFP       = [7; 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6;  6;  6;  4;  6;  6;  4;  6;  6]; % updated 12/07/2017
 
 %% Selected Image Data
 f19_pixel_size = .625; % cm
@@ -69,7 +69,7 @@ end
 close all
 toc
 
-1000*GasTrappingVolumes'
-1000*SlowFillingVolumes'
-1000*Overlap_GTSF_Volumes'
-1000*Combined_GTSF_Volumes'
+%1000*GasTrappingVolumes'
+%1000*SlowFillingVolumes'
+%1000*Overlap_GTSF_Volumes'
+%1000*Combined_GTSF_Volumes'

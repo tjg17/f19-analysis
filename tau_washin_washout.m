@@ -9,9 +9,10 @@ addpath('./functions') % Add path for f19 processing functions
 addpath('G:\2017-Glass\mim\f19_ventilation_segmentations') % add path for f19 data
 
 %% Data for First and Last PFP Times
-patientNumbers = [2; 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 24; 25; 26; 27; 28];
-first_PFP      = [2; 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
-last_PFP       = [7; 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6;  6;  6;  4;  6;  6;  4;  6]; % updated 12/07/2017
+first_last_PFP_data = load('first_last_PFP.txt');
+patientNumbers = first_last_PFP_data(1,:);
+first_PFP = first_last_PFP_data(2,:);
+last_PFP = first_last_PFP_data(3,:);
 
 %% Select Patients for Experiment to Run
 ExperimentName  = 'd0_fitted';

@@ -7,15 +7,13 @@ clear; clc; close all
 home = pwd;
 addpath('./functions') % Add path for f19 processing functions
 
-%% Choose Data Directory
-%addpath('G:\2017-Glass\mim\f19_MATLAB_workspaces') % add path for f19 data
-%addpath('G:\2017-Glass\mim\f19_ventilation_segmentations')
+%% Get Data for First and Last PFP Times
+first_last_PFP_data = load('first_last_PFP.txt');
+patientNumbers = first_last_PFP_data(1,:);
+first_PFP = first_last_PFP_data(2,:);
+last_PFP = first_last_PFP_data(3,:);
 
-%% Data for First and Last PFP Times
-patientNumbers = [2; 3; 4; 5; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 24; 25; 26; 27; 28];
-first_PFP      = [2; 1; 2; 2; 1; 2; 2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2;  2];
-last_PFP       = [7; 5; 7; 7; 7; 7; 6;  6;  6;  7;  6;  5;  7;  6;  6;  7;  6;  6;  6;  6;  4;  6;  6;  4;  6]; % updated 12/07/2017
-
+% background signal info 
 BGD = [5.32985	6.0345	5.8718	6.14255	5.8982	5.88445	5.98415	5.86475	5.78295	6.48255	5.978	5.85025	4.8496	4.8497	4.9275	4.92565 ...
     4.8934	4.84835	10.8336	7.98885	9.33085	9.66375	9.6091	9.76625	9.6471];
 
