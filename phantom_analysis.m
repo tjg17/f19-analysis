@@ -47,43 +47,43 @@ for i=1:length(patientNumbers)
     load(filename); phantom = phantom;
     cd(home)
     
-    %% Plot Phantom
-    figure(1);clf
-    title(sprintf('Subject %i', patientNumbers(i)));
-    window_f19 = [0 120];
-    
-    subplot(4,4,1)
-    imshow(phantom(:,:,2), window_f19)
-    subplot(4,4,2)    
-    imshow(phantom(:,:,3), window_f19)
-    subplot(4,4,3)    
-    imshow(phantom(:,:,4), window_f19)
-    subplot(4,4,4)
-    imshow(phantom(:,:,5), window_f19)
-    subplot(4,4,5)
-    imshow(phantom(:,:,6), window_f19)
-    subplot(4,4,6)
-    imshow(phantom(:,:,7), window_f19)
-    subplot(4,4,7)
-    imshow(phantom(:,:,8), window_f19)
-    subplot(4,4,8)
-    imshow(phantom(:,:,9), window_f19)
-    subplot(4,4,9)
-    imshow(phantom(:,:,10), window_f19)
-    subplot(4,4,10)
-    imshow(phantom(:,:,11), window_f19)
-    subplot(4,4,11)
-    imshow(phantom(:,:,12), window_f19)
-    subplot(4,4,12)
-    imshow(phantom(:,:,13), window_f19)
-    subplot(4,4,13)
-    imshow(phantom(:,:,14), window_f19)
-    subplot(4,4,14)
-    imshow(phantom(:,:,15), window_f19)
-    subplot(4,4,15)
-    imshow(phantom(:,:,16), window_f19)
-    subplot(4,4,16)
-    imshow(phantom(:,:,17), window_f19)
+%     %% Plot Phantom
+%     figure(1);clf
+%     title(sprintf('Subject %i', patientNumbers(i)));
+%     window_f19 = [0 120];
+%     
+%     subplot(4,4,1)
+%     imshow(phantom(:,:,2), window_f19)
+%     subplot(4,4,2)    
+%     imshow(phantom(:,:,3), window_f19)
+%     subplot(4,4,3)    
+%     imshow(phantom(:,:,4), window_f19)
+%     subplot(4,4,4)
+%     imshow(phantom(:,:,5), window_f19)
+%     subplot(4,4,5)
+%     imshow(phantom(:,:,6), window_f19)
+%     subplot(4,4,6)
+%     imshow(phantom(:,:,7), window_f19)
+%     subplot(4,4,7)
+%     imshow(phantom(:,:,8), window_f19)
+%     subplot(4,4,8)
+%     imshow(phantom(:,:,9), window_f19)
+%     subplot(4,4,9)
+%     imshow(phantom(:,:,10), window_f19)
+%     subplot(4,4,10)
+%     imshow(phantom(:,:,11), window_f19)
+%     subplot(4,4,11)
+%     imshow(phantom(:,:,12), window_f19)
+%     subplot(4,4,12)
+%     imshow(phantom(:,:,13), window_f19)
+%     subplot(4,4,13)
+%     imshow(phantom(:,:,14), window_f19)
+%     subplot(4,4,14)
+%     imshow(phantom(:,:,15), window_f19)
+%     subplot(4,4,15)
+%     imshow(phantom(:,:,16), window_f19)
+%     subplot(4,4,16)
+%     imshow(phantom(:,:,17), window_f19)
     
     %% Threshold Value
     threshold_value = 16;
@@ -116,59 +116,67 @@ for i=1:length(patientNumbers)
     p40(i) = prctile(filtered_phantom_vals,40);
     p90(i) = prctile(filtered_phantom_vals,90);
 
-    %% Plot Phantom
-    figure(1);clf
-    
-
-    
-    window_f19 = [0 16];
-    phantom = phantom_thresh_filt;
-    
-    subplot(4,4,1)
-    imshow(phantom(:,:,2), window_f19)
-    subplot(4,4,2)    
-    imshow(phantom(:,:,3), window_f19)
-    subplot(4,4,3)    
-    imshow(phantom(:,:,4), window_f19)
-    subplot(4,4,4)
-    imshow(phantom(:,:,5), window_f19)
-    subplot(4,4,5)
-    imshow(phantom(:,:,6), window_f19)
-    subplot(4,4,6)
-    imshow(phantom(:,:,7), window_f19)
-    subplot(4,4,7)
-    imshow(phantom(:,:,8), window_f19)
-    subplot(4,4,8)
-    imshow(phantom(:,:,9), window_f19)
-    subplot(4,4,9)
-    imshow(phantom(:,:,10), window_f19)
-    subplot(4,4,10)
-    imshow(phantom(:,:,11), window_f19)
-    subplot(4,4,11)
-    imshow(phantom(:,:,12), window_f19)
-    subplot(4,4,12)
-    imshow(phantom(:,:,13), window_f19)
-    subplot(4,4,13)
-    imshow(phantom(:,:,14), window_f19)
-    subplot(4,4,14)
-    imshow(phantom(:,:,15), window_f19)
-    subplot(4,4,15)
-    imshow(phantom(:,:,16), window_f19)
-    subplot(4,4,16)
-    imshow(phantom(:,:,17), window_f19)
-    
-    title(sprintf('Subject %i', patientNumbers(i)));
-    pause(0.3)
-
-    
-%     %% Plot histogram
-%     figure(3);clf
-%     histogram(filtered_phantom_vals)
-%     xlim([10 180])
-%     ylim([0 1500])
-%     title(sprintf('Subject %i', patientNumbers(i)));
+%     %% Plot Phantom
+%     figure(1);clf
 %     
-%     pause(1)      
+% 
+%     
+%     window_f19 = [0 16];
+%     phantom = phantom_thresh_filt;
+%     
+%     subplot(4,4,1)
+%     imshow(phantom(:,:,2), window_f19)
+%     subplot(4,4,2)    
+%     imshow(phantom(:,:,3), window_f19)
+%     subplot(4,4,3)    
+%     imshow(phantom(:,:,4), window_f19)
+%     subplot(4,4,4)
+%     imshow(phantom(:,:,5), window_f19)
+%     subplot(4,4,5)
+%     imshow(phantom(:,:,6), window_f19)
+%     subplot(4,4,6)
+%     imshow(phantom(:,:,7), window_f19)
+%     subplot(4,4,7)
+%     imshow(phantom(:,:,8), window_f19)
+%     subplot(4,4,8)
+%     imshow(phantom(:,:,9), window_f19)
+%     subplot(4,4,9)
+%     imshow(phantom(:,:,10), window_f19)
+%     subplot(4,4,10)
+%     imshow(phantom(:,:,11), window_f19)
+%     subplot(4,4,11)
+%     imshow(phantom(:,:,12), window_f19)
+%     subplot(4,4,12)
+%     imshow(phantom(:,:,13), window_f19)
+%     subplot(4,4,13)
+%     imshow(phantom(:,:,14), window_f19)
+%     subplot(4,4,14)
+%     imshow(phantom(:,:,15), window_f19)
+%     subplot(4,4,15)
+%     imshow(phantom(:,:,16), window_f19)
+%     subplot(4,4,16)
+%     imshow(phantom(:,:,17), window_f19)
+%     
+%     title(sprintf('Subject %i', patientNumbers(i)));
+%     pause(0.3)
+
+    
+    %% Plot histogram
+    figure(3);clf
+    histogram(filtered_phantom_vals)
+    xlabel('Pixel Intensity')
+    ylabel('Number of Pixels')
+    xlim([10 180])
+    ylim([0 1700])
+    title(sprintf('f19 Phantom before Subject %i', patientNumbers(i)));
+    
+    pause(1)
+    
+    %% Save figure (optional)
+    FigureDirectory    = strcat('G:\2017-Glass\f19_fit_results\phantom_histograms\');  mkdir(FigureDirectory);
+    FigureName = strcat('Phantom_Histogram_Subject_',string(patientNumbers(i)));
+    FileName = char(strcat(FigureDirectory,FigureName,'.png'));
+    saveas(gcf,FileName)
            
 end
 
